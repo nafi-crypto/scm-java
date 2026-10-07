@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT:8084}
+  forward-headers-strategy: framework
+spring:
+  application:
+    name: logistics-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/logistics}
+    username: ${DB_USERNAME:scm}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+management:
+  endpoints.web.exposure.include: health,info,prometheus
+  endpoint.health.probes.enabled: true
+  metrics.tags.application: ${spring.application.name}
+springdoc.swagger-ui.path: /swagger-ui.html
+scm:
+  security:
+    public-key-location: ${JWT_PUBLIC_KEY_LOCATION:infrastructure/secrets/public/jwt-public.pem}
+    issuer: ${JWT_ISSUER:http://identity-service:8081}
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}

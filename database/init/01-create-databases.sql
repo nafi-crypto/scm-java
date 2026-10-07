@@ -1,0 +1,6 @@
+CREATE DATABASE identity;
+CREATE DATABASE supply;
+CREATE DATABASE commerce;
+CREATE DATABASE logistics;
+CREATE DATABASE insights;
+CREATE DATABASE notifications;

@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+!.env.example
+infrastructure/secrets
+**/target
+**/node_modules
+**/dist
+**/.idea
+**/.vscode
+**/*.log

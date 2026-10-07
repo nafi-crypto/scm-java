@@ -1,0 +1,85 @@
+server:
+  port: ${SERVER_PORT:8080}
+spring:
+  application:
+    name: edge-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  cloud:
+    gateway:
+      routes:
+        - id: identity
+          uri: ${IDENTITY_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/admin/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientAddressKeyResolver}"
+                redis-rate-limiter.replenishRate: 30
+                redis-rate-limiter.burstCapacity: 60
+        - id: supply
+          uri: ${SUPPLY_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/products/**,/api/v1/suppliers/**,/api/v1/inventory/**,/api/v1/purchase-orders/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientAddressKeyResolver}"
+                redis-rate-limiter.replenishRate: 60
+                redis-rate-limiter.burstCapacity: 120
+        - id: commerce
+          uri: ${COMMERCE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientAddressKeyResolver}"
+                redis-rate-limiter.replenishRate: 60
+                redis-rate-limiter.burstCapacity: 120
+        - id: logistics
+          uri: ${LOGISTICS_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/v1/shipments/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientAddressKeyResolver}"
+                redis-rate-limiter.replenishRate: 60
+                redis-rate-limiter.burstCapacity: 120
+        - id: insights
+          uri: ${INSIGHTS_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/v1/forecasts/**,/api/v1/demand-observations
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientAddressKeyResolver}"
+                redis-rate-limiter.replenishRate: 30
+                redis-rate-limiter.burstCapacity: 60
+        - id: notifications
+          uri: ${NOTIFICATIONS_URL:http://localhost:8086}
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientAddressKeyResolver}"
+                redis-rate-limiter.replenishRate: 30
+                redis-rate-limiter.burstCapacity: 60
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+scm:
+  security:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173}

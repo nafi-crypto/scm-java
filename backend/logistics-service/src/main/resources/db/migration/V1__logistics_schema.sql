@@ -1,0 +1,11 @@
+CREATE TABLE shipments (
+    id UUID PRIMARY KEY,
+    order_id UUID NOT NULL UNIQUE,
+    tracking_number VARCHAR(100) NOT NULL UNIQUE,
+    status VARCHAR(32) NOT NULL CHECK (status IN (
+        'LABEL_CREATED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'
+    )),
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0
+);

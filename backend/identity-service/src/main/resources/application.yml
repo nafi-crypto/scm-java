@@ -1,0 +1,49 @@
+server:
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/identity}
+    username: ${DB_USERNAME:scm}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: ${JWT_PUBLIC_KEY_LOCATION:infrastructure/secrets/public/jwt-public.pem}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+scm:
+  security:
+    private-key-location: ${JWT_PRIVATE_KEY_LOCATION:infrastructure/secrets/identity/jwt-private.pem}
+    public-key-location: ${JWT_PUBLIC_KEY_LOCATION:infrastructure/secrets/public/jwt-public.pem}
+    issuer: ${JWT_ISSUER:http://identity-service:8081}
+    public-endpoints: /actuator/health,/actuator/health/**,/actuator/info,/v3/api-docs/**,/swagger-ui/**,/swagger-ui.html,/api/v1/auth/register,/api/v1/auth/login,/api/v1/auth/refresh
